@@ -15,7 +15,8 @@ class UriBuilder:
         (scheme, authority, path, query, fragment) = urlsplit(base)
         if not scheme or query or fragment or base.endswith('#'):
             raise ValueError(base)
-        self._path_sep = ':' if scheme.lower() == 'urn' else '/'
+        self._is_urn = scheme.lower() == 'urn'
+        self._path_sep = ':' if self._is_urn else '/'
         head = path.split(self._path_sep)
         if head[-1] == '':
             head = head[:-1]
@@ -28,7 +29,10 @@ class UriBuilder:
         tail = path.split('/')
         if tail[0] == '':
             tail = tail[1:]
-        tail.append('')
+        if tail[-1] == '':
+            tail = tail[:-1]
+        if not self._is_urn:
+            tail.append('')
         return urlunsplit((
             self._scheme,
             self._authority,
