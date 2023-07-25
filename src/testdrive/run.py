@@ -10,15 +10,15 @@ import subprocess
 from .source import (Source, sequence)
 from .uri import UriBuilder
 
-def run(test):
+def drive(test):
     """Execute `test` and return a result dict"""
     subp = subprocess.run(test, capture_output=True, check=False)
     if not subp.returncode and not subp.stderr:
         return json.loads(subp.stdout)
+    reason = f'{test} exited with code {subp.returncode}'
     if subp.stderr:
-        reason = subp.stderr.decode()
-    else:
-        reason = f'{test} exited with code {subp.returncode}'
+        reason += '\n\n'
+        reason += subp.stderr.decode()
     return {'result': 'error', 'reason': reason}
 
 def main():
@@ -45,7 +45,7 @@ def main():
     with open(args.filename, encoding='utf-8') as fid:
         source = Source(sequence(json.load(fid)))
     for test in source.next():
-        result = run(os.path.join(basedir, test))
+        result = drive(os.path.join(basedir, test))
         result['id'] = builder.build(os.path.dirname(test))
         print(json.dumps(result))
 
