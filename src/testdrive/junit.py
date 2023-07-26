@@ -9,6 +9,8 @@ import json
 
 from xml.etree import ElementTree as ET
 
+from .run import timevalue
+
 def open_input(filename, encoding='utf-8', **kwargs):
     """Return a context manager for reading from `filename`.
 
@@ -70,7 +72,8 @@ def _testsuite(
     return ET.Element('testsuite', attrs)
 
 def _testcase(
-        uri, error=None, failure=None,
+        uri,
+        error=None, failure=None,
         time=None,
     ):
     """Return XML testcase element, for test case success, failure or error.
@@ -84,7 +87,7 @@ def _testcase(
     `error` and `failure` are supplied, `failure` is ignored.
     """
     attrs = _buildattrs(
-        classname=None, ### TODO
+        classname=None, ### TODO? appears in example JUnit files
         name=uri,
         time=time,
     )
@@ -99,6 +102,36 @@ def _testcase(
         e_case.append(e_failure)
     return e_case
 
+def _time_attr_values(cases):
+    """Return (timestamp, time_total) for test `cases`.
+
+    If `cases` contain no timing information return (None, None). Otherwise
+    return the ISO 8601 string for the earliest timestamp in `cases` for
+    `timestamp`; the total number of seconds from this timestamp to the end of
+    test execution for `time_total`.
+    """
+    # result variables
+    timestamp = time_total = None
+    # working variables
+    tv_start = tv_end = time_last = None
+    for case in cases:
+        if 'timestamp' in case:
+            tv_case = timevalue(case['timestamp'])
+            if tv_start is None:
+                timestamp = case['timestamp']
+                tv_start = tv_end = tv_case
+                time_last = case['time']
+            elif tv_case < tv_start:
+                timestamp = case['timestamp']
+                tv_start = tv_case
+            elif tv_end < tv_case:
+                tv_end = tv_case
+                time_last = case['time']
+    if tv_start is not None:
+        time_total = (tv_end - tv_start).total_seconds() + time_last
+        time_total = round(time_total, 6)
+    return (timestamp, time_total)
+
 def junit(suite, cases, hostname=None, prettify=False):
     """Return JUnit output for test `cases` in `suite`.
 
@@ -107,23 +140,40 @@ def junit(suite, cases, hostname=None, prettify=False):
     metadata;
     `hostname` the name of the host which ran the tests;
     if `prettify` then indent XML output.
+
+    Each case must supply values for keys:
+        id - the test URI
+        result - a boolean test result or "error" (no result produced)
+        reason - string reason describing test failure or error
+
+    Each case may supply values for keys:
+        timestamp - ISO 8601 string of UTC time when the test was started
+        time - test duration in seconds
+
+    If `timestamp` is supplied then `time` must also be supplied.
     """
     tests = len(cases)
-    failures = sum(1 for case in cases if case['result'] is False)
     errors = sum(1 for case in cases if case['result'] == 'error')
+    failures = sum(1 for case in cases if case['result'] is False)
+    (timestamp, time_total) = _time_attr_values(cases)
     e_root = _testsuites(tests, errors, failures)
-    e_suite = _testsuite(suite, tests, errors, failures, hostname=hostname)
+    e_suite = _testsuite(
+        suite,
+        tests, errors, failures,
+        hostname=hostname,
+        timestamp=timestamp, time=time_total,
+    )
     for case in cases:
-        if case['result'] is True:
-            e_case = _testcase(case['id'])
-        elif case['result'] is False:
-            e_case = _testcase(case['id'], failure=case['reason'])
+        kwargs = {'time': case.get('time')}
+        if case['result'] is False:
+            kwargs['failure'] = case['reason']
         elif case['result'] == 'error':
-            e_case = _testcase(case['id'], error=case['reason'])
-        else:
+            kwargs['error'] = case['reason']
+        elif case['result'] is not True:
             raise ValueError(
                 f"""bad result "{case['result']}" for case {case['id']}"""
             )
+        e_case = _testcase(case['id'], **kwargs)
         e_suite.append(e_case)
     e_root.append(e_suite)
     if prettify:
