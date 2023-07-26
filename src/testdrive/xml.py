@@ -47,7 +47,7 @@ def main():
     aparser.add_argument('filename', help="XML data file")
     args = aparser.parse_args()
     reason = validate(args.schema, args.filename)
-    if reason:
+    if reason is not True:
         sys.exit(reason if args.verbose else 1)
     elif args.prettify:
         print(prettify(args.filename))
