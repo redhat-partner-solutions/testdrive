@@ -2,17 +2,16 @@
 
 `testdrive` is a library for:
 
- * Building a URI for a test case based from base URI and the test case path
- * Generating a JUnit file suitable for supplying to [Red Hat DCI][1] or other
-   CI
+ * Building a URI for a test case from a base URI and the test case path
+ * Generating JUnit test results for supplying to [Red Hat DCI][1] or other CI
 
 The implementation of [testdrive.run.main()][2] provides an illustration of how
 this library can be used.
 
 ## testdrive.run
 
-Module `testdrive.run` is also a convenience tool for running a set of tests
-specified in a JSON file. The following uses example files in this repo:
+Module `testdrive.run` is a convenience tool for running a set of tests
+specified in a JSON file. Using example files in this repo:
 
     $ env PYTHONPATH=src python3 -m testdrive.run https://github.com/redhat-partner-solutions/testdrive/ examples/sequence/tests.json
     {"result": false, "reason": "something went wrong", "data": {"foo": "bar"}, "id": "https://github.com/redhat-partner-solutions/testdrive/A/", "timestamp": "2023-07-27T15:48:52.376983+00:00", "time": 0.028625}
@@ -21,8 +20,8 @@ specified in a JSON file. The following uses example files in this repo:
 
 ## testdrive.junit
 
-Module `testdrive.junit` can be used to generate a JUnit file from lines of
-JSON (one line per test case result):
+Module `testdrive.junit` can be used to generate JUnit test results from lines
+of JSON (one line per test case result):
 
     $ python3 -m testdrive.run https://github.com/redhat-partner-solutions/testdrive/ examples/sequence/tests.json | \
       python3 -m testdrive.junit --prettify "examples.sequence" -
@@ -42,8 +41,9 @@ JSON (one line per test case result):
 ## testdrive.xml
 
 Module `testdrive.xml` provides a basic XML validator. This, along with the
-schema file `junit/schema/testdrive.xsd`, are provided in order to test the
-output from `testdrive.junit` and for comparison with `junit/schema/junit.xsd`.
+schema file `junit/schema/testdrive.xsd`, is provided in order to test the
+output from `testdrive.junit` and to allow comparison with Windy Road JUnit
+schema `junit/schema/junit.xsd`.
 
 The following JUnit output from testdrive...
 
@@ -77,7 +77,7 @@ The following JUnit output from testdrive...
       </testsuite>
     </testsuites>
 
-...and _does not validate_ using the Windy Road JUnit schema:
+...and _does not_ validate using the Windy Road JUnit schema:
 
     $ python3 -m testdrive.xml --verbose junit/schema/junit.xsd results.xml
     failed validating {'tests': '3', 'errors': '0', 'failures': '2', 'skipped': '0'} with XsdAttributeGroup():
