@@ -2,23 +2,13 @@
 
 """Generate JUnit output"""
 
-import sys
-from contextlib import nullcontext
 from argparse import ArgumentParser
 import json
 
 from xml.etree import ElementTree as ET
 
-from .run import timevalue
-
-def open_input(filename, encoding='utf-8', **kwargs):
-    """Return a context manager for reading from `filename`.
-
-    If `filename` is '-' then read from stdin instead of `filename`.
-    """
-    if filename == '-':
-        return nullcontext(sys.stdin)
-    return open(filename, encoding=encoding, **kwargs)
+from .cases import summarize
+from .common import open_input
 
 def _buildattrs(**kwargs):
     """Return a dict from `kwargs` suitable for creating an XML element with."""
@@ -108,36 +98,6 @@ def _testcase(
         e_case.append(e_failure)
     return e_case
 
-def _time_attr_values(cases):
-    """Return (timestamp, time_total) for test `cases`.
-
-    If `cases` contain no timing information return (None, None). Otherwise
-    return the ISO 8601 string for the earliest timestamp in `cases` for
-    `timestamp`; the total number of seconds from this timestamp to the end of
-    test execution for `time_total`.
-    """
-    # result variables
-    timestamp = time_total = None
-    # working variables
-    tv_start = tv_end = time_last = None
-    for case in cases:
-        if 'timestamp' in case:
-            tv_case = timevalue(case['timestamp'])
-            if tv_start is None:
-                timestamp = case['timestamp']
-                tv_start = tv_end = tv_case
-                time_last = case['time']
-            elif tv_case < tv_start:
-                timestamp = case['timestamp']
-                tv_start = tv_case
-            elif tv_end < tv_case:
-                tv_end = tv_case
-                time_last = case['time']
-    if tv_start is not None:
-        time_total = (tv_end - tv_start).total_seconds() + time_last
-        time_total = round(time_total, 6)
-    return (timestamp, time_total)
-
 def junit(suite, cases, hostname=None, prettify=False):
     """Return JUnit output for test `cases` in `suite`.
 
@@ -158,10 +118,12 @@ def junit(suite, cases, hostname=None, prettify=False):
 
     If `timestamp` is supplied then `time` must also be supplied.
     """
-    tests = len(cases)
-    errors = sum(1 for case in cases if case['result'] == 'error')
-    failures = sum(1 for case in cases if case['result'] is False)
-    (timestamp, time_total) = _time_attr_values(cases)
+    summary = summarize(cases)
+    tests = summary['total']
+    errors = summary['error']
+    failures = summary['failure']
+    timestamp = summary['timestamp']
+    time_total = summary['duration']
     e_root = _testsuites(tests, errors, failures)
     e_suite = _testsuite(
         suite,

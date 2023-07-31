@@ -4,6 +4,7 @@
 
  * Building a URI for a test case from a base URI and the test case path
  * Generating JUnit test results for supplying to [Red Hat DCI][1] or other CI
+ * Generating [Asciidoc][3] test results for human consumption
 
 The implementation of [testdrive.run.main()][2] provides an illustration of how
 this library can be used.
@@ -14,9 +15,9 @@ Module `testdrive.run` is a convenience tool for running a set of tests
 specified in a JSON file. Using example files in this repo:
 
     $ env PYTHONPATH=src python3 -m testdrive.run https://github.com/redhat-partner-solutions/testdrive/ examples/sequence/tests.json
-    {"result": false, "reason": "something went wrong", "data": {"foo": "bar"}, "id": "https://github.com/redhat-partner-solutions/testdrive/A/", "timestamp": "2023-07-27T15:48:52.376983+00:00", "time": 0.028625}
-    {"result": true, "reason": null, "data": {"baz": 99}, "id": "https://github.com/redhat-partner-solutions/testdrive/B/", "timestamp": "2023-07-27T15:48:52.405772+00:00", "time": 0.065822}
-    {"result": false, "reason": "no particular reason", "id": "https://github.com/redhat-partner-solutions/testdrive/C/", "timestamp": "2023-07-27T15:48:52.471740+00:00", "time": 0.006504}
+    {"result": false, "reason": "something went wrong", "data": {"foo": "bar"}, "id": "https://github.com/redhat-partner-solutions/testdrive/A/", "timestamp": "2023-07-31T13:29:08.844977+00:00", "time": 0.029334}
+    {"result": true, "reason": null, "data": {"baz": 99}, "id": "https://github.com/redhat-partner-solutions/testdrive/B/", "timestamp": "2023-07-31T13:29:08.874374+00:00", "time": 0.02897}
+    {"result": false, "reason": "no particular reason", "id": "https://github.com/redhat-partner-solutions/testdrive/C/", "timestamp": "2023-07-31T13:29:08.903396+00:00", "time": 0.003881}
 
 ## testdrive.junit
 
@@ -27,13 +28,13 @@ of JSON (one line per test case result):
       python3 -m testdrive.junit --prettify "examples.sequence" -
     <?xml version='1.0' encoding='utf-8'?>
     <testsuites tests="3" errors="0" failures="2" skipped="0">
-      <testsuite name="examples.sequence" tests="3" errors="0" failures="2" skipped="0" timestamp="2023-07-27T16:18:15.986502+00:00" time="0.121763">
-        <testcase name="https://github.com/redhat-partner-solutions/testdrive/A/" time="0.045674">
-          <failure message="something went wrong" />
+      <testsuite name="examples.sequence" tests="3" errors="0" failures="2" skipped="0" timestamp="2023-07-31T13:29:08.844977+00:00" time="0.0623">
+        <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/A/" time="0.029334">
+          <failure type="Failure" message="something went wrong" />
         </testcase>
-        <testcase name="https://github.com/redhat-partner-solutions/testdrive/B/" time="0.068546" />
-        <testcase name="https://github.com/redhat-partner-solutions/testdrive/C/" time="0.007399">
-          <failure message="no particular reason" />
+        <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/B/" time="0.02897" />
+        <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/C/" time="0.003881">
+          <failure type="Failure" message="no particular reason" />
         </testcase>
       </testsuite>
     </testsuites>
@@ -50,13 +51,13 @@ The following JUnit output from testdrive...
     $ cat results.xml
     <?xml version='1.0' encoding='utf-8'?>
     <testsuites tests="3" errors="0" failures="2" skipped="0">
-      <testsuite name="examples.sequence" tests="3" errors="0" failures="2" skipped="0" timestamp="2023-07-27T16:18:15.986502+00:00" time="0.121763">
-        <testcase name="https://github.com/redhat-partner-solutions/testdrive/A/" time="0.045674">
-          <failure message="something went wrong" />
+      <testsuite name="examples.sequence" tests="3" errors="0" failures="2" skipped="0" timestamp="2023-07-31T13:29:08.844977+00:00" time="0.0623">
+        <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/A/" time="0.029334">
+          <failure type="Failure" message="something went wrong" />
         </testcase>
-        <testcase name="https://github.com/redhat-partner-solutions/testdrive/B/" time="0.068546" />
-        <testcase name="https://github.com/redhat-partner-solutions/testdrive/C/" time="0.007399">
-          <failure message="no particular reason" />
+        <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/B/" time="0.02897" />
+        <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/C/" time="0.003881">
+          <failure type="Failure" message="no particular reason" />
         </testcase>
       </testsuite>
     </testsuites>
@@ -66,13 +67,13 @@ The following JUnit output from testdrive...
     $ python3 -m testdrive.xml junit/schema/testdrive.xsd results.xml
     <?xml version='1.0' encoding='utf-8'?>
     <testsuites tests="3" errors="0" failures="2" skipped="0">
-      <testsuite name="examples.sequence" tests="3" errors="0" failures="2" skipped="0" timestamp="2023-07-27T16:18:15.986502+00:00" time="0.121763">
-        <testcase name="https://github.com/redhat-partner-solutions/testdrive/A/" time="0.045674">
-          <failure message="something went wrong" />
+      <testsuite name="examples.sequence" tests="3" errors="0" failures="2" skipped="0" timestamp="2023-07-31T13:29:08.844977+00:00" time="0.0623">
+        <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/A/" time="0.029334">
+          <failure type="Failure" message="something went wrong" />
         </testcase>
-        <testcase name="https://github.com/redhat-partner-solutions/testdrive/B/" time="0.068546" />
-        <testcase name="https://github.com/redhat-partner-solutions/testdrive/C/" time="0.007399">
-          <failure message="no particular reason" />
+        <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/B/" time="0.02897" />
+        <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/C/" time="0.003881">
+          <failure type="Failure" message="no particular reason" />
         </testcase>
       </testsuite>
     </testsuites>
@@ -112,13 +113,13 @@ The following JUnit output from testdrive...
     Instance:
 
       <testsuites tests="3" errors="0" failures="2" skipped="0">
-        <testsuite name="examples.sequence" tests="3" errors="0" failures="2" skipped="0" timestamp="2023-07-27T16:18:15.986502+00:00" time="0.121763">
-          <testcase name="https://github.com/redhat-partner-solutions/testdrive/A/" time="0.045674">
-            <failure message="something went wrong" />
+        <testsuite name="examples.sequence" tests="3" errors="0" failures="2" skipped="0" timestamp="2023-07-31T13:29:08.844977+00:00" time="0.0623">
+          <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/A/" time="0.029334">
+            <failure type="Failure" message="something went wrong" />
           </testcase>
-          <testcase name="https://github.com/redhat-partner-solutions/testdrive/B/" time="0.068546" />
-          <testcase name="https://github.com/redhat-partner-solutions/testdrive/C/" time="0.007399">
-            <failure message="no particular reason" />
+          <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/B/" time="0.02897" />
+          <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/C/" time="0.003881">
+            <failure type="Failure" message="no particular reason" />
           </testcase>
         </testsuite>
       </testsuites>
@@ -155,5 +156,46 @@ To see the differences between the schemas, simply use diff:
     < 						<xs:complexContent>
     ...
 
+## testdrive.asciidoc
+
+Module `testdrive.asciidoc` can be used to generate [Asciidoc][3] test results
+from lines of JSON (one line per test case result):
+
+    $ python3 -m testdrive.run https://github.com/redhat-partner-solutions/testdrive/ examples/sequence/tests.json | \
+      python3 -m testdrive.asciidoc "examples.sequence" - | tee results.adoc
+    === Test Suite: examples.sequence
+
+    ==== Summary
+
+    [cols=2*.^a]
+    |===
+
+
+    |
+    *hostname*
+    |
+    _not known_
+
+    |
+    *started*
+    |
+    2023-07-31T13:29:08.844977+00:00
+    ...
+
+To include this in a simple report:
+
+    $ cat report.adoc
+    = Test Report
+
+    :toc:
+
+    == Test Results
+
+    <<<
+    include::results.adoc[]
+
+    $ asciidoctor -a toc report.adoc && firefox report.html
+
 [1]: https://www.distributed-ci.io/
 [2]: https://github.com/redhat-partner-solutions/testdrive/blob/cce8fb30bd8eed8e83f53665cd1433e20c81cfd3/src/testdrive/run.py#L60
+[3]: https://docs.asciidoctor.org/asciidoc/latest/
