@@ -95,7 +95,11 @@ Permission to waive conditions of this license may be requested from Windy Road 
 												<xs:documentation xml:lang="en">The error message. e.g., if a java exception is thrown, the return value of getMessage()</xs:documentation>
 											</xs:annotation>
 										</xs:attribute>
-										<!-- modified: remove attribute type -->
+										<xs:attribute name="type" type="xs:string" use="required">
+											<xs:annotation>
+												<xs:documentation xml:lang="en">The type of error that occured. e.g., if a java execption is thrown the full class name of the exception.</xs:documentation>
+											</xs:annotation>
+										</xs:attribute>
 									</xs:extension>
 								</xs:simpleContent>
 							</xs:complexType>
@@ -112,7 +116,11 @@ Permission to waive conditions of this license may be requested from Windy Road 
 												<xs:documentation xml:lang="en">The message specified in the assert</xs:documentation>
 											</xs:annotation>
 										</xs:attribute>
-										<!-- modified: remove attribute type -->
+										<xs:attribute name="type" type="xs:string" use="required">
+											<xs:annotation>
+												<xs:documentation xml:lang="en">The type of the assert.</xs:documentation>
+											</xs:annotation>
+										</xs:attribute>
 									</xs:extension>
 								</xs:simpleContent>
 							</xs:complexType>
@@ -123,7 +131,11 @@ Permission to waive conditions of this license may be requested from Windy Road 
 							<xs:documentation xml:lang="en">Name of the test method</xs:documentation>
 						</xs:annotation>
 					</xs:attribute>
-					<!-- modified: remove attribute classname -->
+					<xs:attribute name="classname" type="xs:token" use="required">
+						<xs:annotation>
+							<xs:documentation xml:lang="en">Full class name for the class the test method is in.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
 					<xs:attribute name="time" type="xs:decimal" use="required">
 						<xs:annotation>
 							<xs:documentation xml:lang="en">Time taken (in seconds) to execute the test</xs:documentation>

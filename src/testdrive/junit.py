@@ -54,7 +54,7 @@ def _testsuite(
     ): # pylint: disable=too-many-arguments
     """Return XML testsuite element, a container for test cases.
 
-    `suite` is the name of the test suite.
+    `suite` is the name of the test suite;
     `tests` is the number of tests run;
     `errors` the number of tests which did not return a result;
     `failures` the number of tests which returned a failure result;
@@ -72,12 +72,13 @@ def _testsuite(
     return ET.Element('testsuite', attrs)
 
 def _testcase(
-        uri,
+        suite, uri,
         error=None, failure=None,
         time=None,
     ):
     """Return XML testcase element, for test case success, failure or error.
 
+    `suite` is the name of the test suite;
     `uri` is the URI of the test case;
     `error` is the error reason;
     `failure` is the failure reason;
@@ -87,18 +88,23 @@ def _testcase(
     `error` and `failure` are supplied, `failure` is ignored.
     """
     attrs = _buildattrs(
-        classname=None, ### TODO? appears in example JUnit files
-        name=uri,
+        classname=suite, name=uri,
         time=time,
     )
     e_case = ET.Element('testcase', attrs)
     if error is not None:
         message = error.split('\n', 1)[0]
-        e_error = ET.Element('error', {'message': message})
+        e_error = ET.Element('error', {
+            'type': 'Error',
+            'message': message,
+        })
         e_case.append(e_error)
     elif failure is not None:
         message = failure.split('\n', 1)[0]
-        e_failure = ET.Element('failure', {'message': message})
+        e_failure = ET.Element('failure', {
+            'type': 'Failure',
+            'message': message,
+        })
         e_case.append(e_failure)
     return e_case
 
@@ -173,7 +179,7 @@ def junit(suite, cases, hostname=None, prettify=False):
             raise ValueError(
                 f"""bad result "{case['result']}" for case {case['id']}"""
             )
-        e_case = _testcase(case['id'], **kwargs)
+        e_case = _testcase(suite, case['id'], **kwargs)
         e_suite.append(e_case)
     e_root.append(e_suite)
     if prettify:
