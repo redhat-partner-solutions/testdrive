@@ -4,7 +4,7 @@
 
 import json
 from argparse import ArgumentParser
-import os.path
+import os
 import subprocess
 from datetime import (datetime, timezone)
 
@@ -13,7 +13,7 @@ from .uri import UriBuilder
 
 def drive(test, *test_args):
     """Execute `test` and return a result dict"""
-    subp = subprocess.run([test] + list(test_args), capture_output=True, check=False)
+    subp = subprocess.run([test] + list(test_args), capture_output=True, check=False, env=os.environ)
     if not subp.returncode and not subp.stderr:
         return json.loads(subp.stdout)
     reason = f'{test} exited with code {subp.returncode}'
