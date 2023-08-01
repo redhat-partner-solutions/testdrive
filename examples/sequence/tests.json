@@ -1,5 +1,5 @@
 [
-    "A/testimpl.py",
-    "B/testimpl.py",
-    "C/test.sh"
+    ["A/testimpl.py"],
+    ["B/testimpl.py"],
+    ["C/test.sh"]
 ]
