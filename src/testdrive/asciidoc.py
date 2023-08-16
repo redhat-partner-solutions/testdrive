@@ -33,7 +33,7 @@ def asciidoc(suite, cases, hostname=None):
     """
     summary = summarize(cases)
     lines = [
-        f'=== Test Suite: {suite}',
+        f'== Test Suite: {suite}',
         '',
         '==== Summary',
         '',
