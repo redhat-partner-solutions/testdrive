@@ -9,6 +9,7 @@ from xml.etree import ElementTree as ET
 
 from .cases import summarize
 from .common import open_input
+from .uri import UriBuilder
 
 def _buildattrs(**kwargs):
     """Return a dict from `kwargs` suitable for creating an XML element with."""
@@ -112,7 +113,23 @@ def _system_out(case, exclude=()):
     )
     return elem
 
-def junit(suite, cases, hostname=None, exclude=(), prettify=False):
+def _properties(*args):
+    """Return XML properties element.
+
+    Include a sub-element for each property (name, value) in `args`.
+    """
+    elem = ET.Element('properties')
+    for (name, value) in args:
+        elem.append(ET.Element('property', name=name, value=str(value)))
+    return elem
+
+def junit(
+        suite, cases,
+        hostname=None,
+        exclude=(),
+        baseurl_ids=None, baseurl_specs=None,
+        prettify=False,
+    ):
     """Return JUnit output for test `cases` in `suite`.
 
     `suite` is the string name of the test suite;
@@ -120,6 +137,8 @@ def junit(suite, cases, hostname=None, exclude=(), prettify=False):
     metadata;
     `hostname` the name of the host which ran the tests;
     `exclude` is a sequence of keys to omit from the JSON object in system-out;
+    `baseurl_ids` is the base URL for test ids;
+    `baseurl_specs` is the base URL for test specifications;
     if `prettify` then indent XML output.
 
     Each case must supply values for keys:
@@ -132,7 +151,13 @@ def junit(suite, cases, hostname=None, exclude=(), prettify=False):
         time - test duration in seconds
 
     If `timestamp` is supplied then `time` must also be supplied.
+
+    If both `baseurl_ids` and `baseurl_specs` are supplied then add a property
+    for 'test_specification' by mapping a URL under `baseurl_specs`.
     """
+    uri_builder = None
+    if baseurl_ids and baseurl_specs:
+        uri_builder = UriBuilder(baseurl_ids)
     summary = summarize(cases)
     tests = summary['total']
     errors = summary['error']
@@ -158,6 +183,11 @@ def junit(suite, cases, hostname=None, exclude=(), prettify=False):
                 f"""bad result "{case['result']}" for case {case['id']}"""
             )
         e_case.append(_system_out(case, exclude=exclude))
+        properties = [('test_id', case['id'])]
+        if uri_builder:
+            testspec_url = uri_builder.rebase(case['id'], baseurl_specs)
+            properties.append(('test_specification', testspec_url))
+        e_case.append(_properties(*properties))
         e_suite.append(e_case)
     e_root.append(e_suite)
     if prettify:
@@ -188,6 +218,14 @@ def main():
         help="pretty print XML output",
     )
     aparser.add_argument(
+        '--baseurl-ids',
+        help="The base URL which test ids are relative to.",
+    )
+    aparser.add_argument(
+        '--baseurl-specs',
+        help="The base URL which test specifications are relative to.",
+    )
+    aparser.add_argument(
         'suite',
         help="The name of the test suite. (Used in JUnit output.)",
     )
@@ -198,7 +236,14 @@ def main():
     args = aparser.parse_args()
     with open_input(args.input) as fid:
         cases = tuple(json.loads(line) for line in fid)
-    print(junit(args.suite, cases, args.hostname, args.exclude, args.prettify))
+    print(junit(
+        args.suite,
+        cases,
+        args.hostname,
+        args.exclude,
+        args.baseurl_ids, args.baseurl_specs,
+        args.prettify,
+    ))
 
 if __name__ == '__main__':
     main()

@@ -69,7 +69,7 @@ def main():
     )
     aparser.add_argument(
         'baseurl',
-        help="The base URL which tests are relative to.",
+        help="The base URL which test ids are relative to.",
     )
     aparser.add_argument(
         'input',

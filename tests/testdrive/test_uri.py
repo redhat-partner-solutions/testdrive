@@ -46,6 +46,42 @@ class TestUrn(TestCase):
                     UriBuilder(base + b_suffix, **qargs).build(path + p_suffix),
                     'urn:ghi:quux:corge?v=2',
                 )
+    def test_urn_rebase_errors(self):
+        """Test testdrive.uri.UriBuilder rebase URN errors"""
+        base = 'urn:jkl'
+        path = '/wibble/wobble/'
+        qargs = {'x': 'y'}
+        builder = UriBuilder(base, **qargs)
+        urn = builder.build(path)
+        other = 'https://target/base/'
+        self.assertEqual(
+            builder.rebase(urn, other),
+            'https://target/base/wibble/wobble/',
+        )
+        with self.assertRaises(ValueError):
+            builder.rebase('https://xyz/wibble/wobble/', other)
+        with self.assertRaises(ValueError):
+            builder.rebase('urn:xyz:wibble:wobble', other)
+        with self.assertRaises(ValueError):
+            builder.rebase(urn + '#frag', other)
+        with self.assertRaises(ValueError):
+            builder.rebase(urn + '#', other)
+    def test_urn_rebase(self):
+        """Test testdrive.uri.UriBuilder rebases URN"""
+        base1 = 'urn:jkl'
+        base2 = 'URN:mno:pqr:'
+        path = '/wibble/wobble/'
+        qargs = {'x': 'y'}
+        builder = UriBuilder(base1, **qargs)
+        urn = builder.build(path)
+        self.assertEqual(
+            urn,
+            'urn:jkl:wibble:wobble?x=y',
+        )
+        self.assertEqual(
+            builder.rebase(urn, base2),
+            'urn:mno:pqr:wibble:wobble',
+        )
 
 class TestUrl(TestCase):
     """Tests for testdrive.uri.UriBuilder building URL"""
@@ -89,3 +125,41 @@ class TestUrl(TestCase):
                     UriBuilder(base + b_suffix, **qargs).build(path + p_suffix),
                     'https://ghi.org/quux/corge/?v=thud',
                 )
+    def test_url_rebase_errors(self):
+        """Test testdrive.uri.UriBuilder rebase URL errors"""
+        base = 'https://jkl.co.uk/mno/'
+        path = '/wibble/wobble/'
+        qargs = {'x': 'Y'}
+        builder = UriBuilder(base, **qargs)
+        url = builder.build(path)
+        other = 'https://target/base/'
+        self.assertEqual(
+            builder.rebase(url, other),
+            'https://target/base/wibble/wobble/',
+        )
+        with self.assertRaises(ValueError):
+            builder.rebase('ftp://jkl.co.uk/mno/wibble/wobble/', other)
+        with self.assertRaises(ValueError):
+            builder.rebase('https://mno.co.uk/mno/wibble/wobble/', other)
+        with self.assertRaises(ValueError):
+            builder.rebase('https://jkl.co.uk/jkl/wibble/wobble/', other)
+        with self.assertRaises(ValueError):
+            builder.rebase(url + '#frag', other)
+        with self.assertRaises(ValueError):
+            builder.rebase(url + '#', other)
+    def test_url_rebase(self):
+        """Test testdrive.uri.UriBuilder rebases URL"""
+        base1 = 'https://jkl.com/'
+        base2 = 'ftp://mno.pqr/stu/'
+        path = '/wibble/wobble/'
+        qargs = {'X': 'y'}
+        builder = UriBuilder(base1, **qargs)
+        url = builder.build(path)
+        self.assertEqual(
+            url,
+            'https://jkl.com/wibble/wobble/?X=y',
+        )
+        self.assertEqual(
+            builder.rebase(url, base2),
+            'ftp://mno.pqr/stu/wibble/wobble/',
+        )

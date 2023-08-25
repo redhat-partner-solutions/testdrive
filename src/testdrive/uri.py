@@ -40,3 +40,15 @@ class UriBuilder:
             self._query,
             None, # never supply a fragment
         ))
+    def rebase(self, uri, base):
+        """Return a URI from `uri` rebased under `base`, discarding query"""
+        (scheme, authority, path, _, fragment) = urlsplit(uri)
+        path = path.split(self._path_sep)
+        if (    scheme.lower() != self._scheme.lower() or
+                authority != self._authority or
+                path[:len(self._head)] != self._head or
+                fragment or
+                uri.endswith('#')
+            ):
+            raise ValueError(f'cannot rebase {uri}')
+        return UriBuilder(base).build('/'.join(path[len(self._head):]))
