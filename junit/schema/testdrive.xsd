@@ -18,6 +18,22 @@ Copyright © 2011, Windy Road Technology Pty. Limited
 The Apache Ant JUnit XML Schema is distributed under the terms of the Apache License Version 2.0 http://www.apache.org/licenses/
 Permission to waive conditions of this license may be requested from Windy Road Support (http://windyroad.org/support).</xs:documentation>
 	</xs:annotation>
+
+	<!-- modified: define properties, property elements -->
+	<xs:element name="properties">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="property" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="property">
+		<xs:complexType>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+			<xs:attribute name="value" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+
 	<xs:element name="testsuite" type="testsuite"/>
 	<!-- modified: add microseconds and explicit UTC timezone -->
 	<xs:simpleType name="ISO8601_DATETIME_UTC">
@@ -143,7 +159,18 @@ Permission to waive conditions of this license may be requested from Windy Road 
 					</xs:attribute>
 				</xs:complexType>
 			</xs:element>
-			<!-- modified: remove element system-out -->
+			<!-- modified: added element properties -->
+			<xs:element ref="properties" />
+			<xs:element name="system-out">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Data that was written to standard out while the test was executed</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="pre-string">
+						<xs:whiteSpace value="preserve"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
 			<!-- modified: remove element system-err -->
 		</xs:sequence>
 		<xs:attribute name="name" use="required">
