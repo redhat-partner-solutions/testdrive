@@ -4,11 +4,12 @@
 
 import json
 from argparse import ArgumentParser
+import sys
 import os
 import subprocess
 from datetime import (datetime, timezone)
 
-from .common import open_input
+from .common import (open_input, print_line)
 from .source import (Source, sequence)
 from .uri import UriBuilder
 
@@ -96,7 +97,9 @@ def main():
             if not args.timeless:
                 result['timestamp'] = timestamp(start)
                 result['time'] = (end - start).total_seconds()
-            print(json.dumps(result))
+            # Python exits with error code 1 on EPIPE
+            if not print_line(json.dumps(result)):
+                sys.exit(1)
 
 if __name__ == '__main__':
     main()
