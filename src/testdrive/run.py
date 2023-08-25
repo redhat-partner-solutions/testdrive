@@ -13,20 +13,33 @@ from .source import (Source, sequence)
 from .uri import UriBuilder
 
 def drive(test, *test_args):
-    """Execute `test` and return a result dict"""
+    """Execute `test` and return a result dict.
+
+    If `test` exits with error or outputs to stderr, then the result dict
+    will contain string 'error' at key 'result' and a string at key 'reason'.
+
+    Otherwise the result dict contains whatever `test` outputs to stdout. This
+    output is always expected to be a JSON object with pairs for 'result',
+    'reason' and other pairs appropriate for `test`.
+
+    The result dict always contains `test_args` at key 'argv'.
+    """
     subp = subprocess.run(
-        [test] + list(test_args),
+        (test,) + test_args,
         capture_output=True,
         check=False,
         env=os.environ,
     )
     if not subp.returncode and not subp.stderr:
-        return json.loads(subp.stdout)
-    reason = f'{test} exited with code {subp.returncode}'
-    if subp.stderr:
-        reason += '\n\n'
-        reason += subp.stderr.decode()
-    return {'result': 'error', 'reason': reason}
+        dct = json.loads(subp.stdout)
+    else:
+        reason = f'{test} exited with code {subp.returncode}'
+        if subp.stderr:
+            reason += '\n\n'
+            reason += subp.stderr.decode()
+            dct = {'result': 'error', 'reason': reason}
+    dct['argv'] = test_args
+    return dct
 
 def timenow():
     """Return a datetime value for UTC time now."""
