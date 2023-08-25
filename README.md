@@ -36,13 +36,44 @@ of JSON (one line per test case result):
       python3 -m testdrive.junit --prettify "examples.sequence" -
     <?xml version='1.0' encoding='utf-8'?>
     <testsuites tests="3" errors="0" failures="2" skipped="0">
-      <testsuite name="examples.sequence" tests="3" errors="0" failures="2" skipped="0" timestamp="2023-07-31T13:29:08.844977+00:00" time="0.0623">
-        <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/A/" time="0.029334">
+      <testsuite name="examples.sequence" tests="3" errors="0" failures="2" skipped="0" timestamp="2023-08-25T10:45:51.061162+00:00" time="0.078068">
+        <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/A/" time="0.047357">
           <failure type="Failure" message="something went wrong" />
+          <system-out>{
+        "argv": [],
+        "data": {
+            "foo": "bar"
+        },
+        "reason": "something went wrong",
+        "result": false
+    }</system-out>
+          <properties>
+            <property name="test_id" value="https://github.com/redhat-partner-solutions/testdrive/A/" />
+          </properties>
         </testcase>
-        <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/B/" time="0.02897" />
-        <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/C/" time="0.003881">
+        <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/B/" time="0.025998">
+          <system-out>{
+        "argv": [],
+        "data": {
+            "baz": 99
+        },
+        "reason": null,
+        "result": true
+    }</system-out>
+          <properties>
+            <property name="test_id" value="https://github.com/redhat-partner-solutions/testdrive/B/" />
+          </properties>
+        </testcase>
+        <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/C/" time="0.004589">
           <failure type="Failure" message="no particular reason" />
+          <system-out>{
+        "argv": [],
+        "reason": "no particular reason",
+        "result": false
+    }</system-out>
+          <properties>
+            <property name="test_id" value="https://github.com/redhat-partner-solutions/testdrive/C/" />
+          </properties>
         </testcase>
       </testsuite>
     </testsuites>
@@ -59,13 +90,44 @@ The following JUnit output from testdrive...
     $ cat results.xml
     <?xml version='1.0' encoding='utf-8'?>
     <testsuites tests="3" errors="0" failures="2" skipped="0">
-      <testsuite name="examples.sequence" tests="3" errors="0" failures="2" skipped="0" timestamp="2023-07-31T13:29:08.844977+00:00" time="0.0623">
-        <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/A/" time="0.029334">
+      <testsuite name="examples.sequence" tests="3" errors="0" failures="2" skipped="0" timestamp="2023-08-25T10:45:51.061162+00:00" time="0.078068">
+        <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/A/" time="0.047357">
           <failure type="Failure" message="something went wrong" />
+          <system-out>{
+        "argv": [],
+        "data": {
+            "foo": "bar"
+        },
+        "reason": "something went wrong",
+        "result": false
+    }</system-out>
+          <properties>
+            <property name="test_id" value="https://github.com/redhat-partner-solutions/testdrive/A/" />
+          </properties>
         </testcase>
-        <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/B/" time="0.02897" />
-        <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/C/" time="0.003881">
+        <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/B/" time="0.025998">
+          <system-out>{
+        "argv": [],
+        "data": {
+            "baz": 99
+        },
+        "reason": null,
+        "result": true
+    }</system-out>
+          <properties>
+            <property name="test_id" value="https://github.com/redhat-partner-solutions/testdrive/B/" />
+          </properties>
+        </testcase>
+        <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/C/" time="0.004589">
           <failure type="Failure" message="no particular reason" />
+          <system-out>{
+        "argv": [],
+        "reason": "no particular reason",
+        "result": false
+    }</system-out>
+          <properties>
+            <property name="test_id" value="https://github.com/redhat-partner-solutions/testdrive/C/" />
+          </properties>
         </testcase>
       </testsuite>
     </testsuites>
@@ -75,13 +137,44 @@ The following JUnit output from testdrive...
     $ python3 -m testdrive.xml junit/schema/testdrive.xsd results.xml
     <?xml version='1.0' encoding='utf-8'?>
     <testsuites tests="3" errors="0" failures="2" skipped="0">
-      <testsuite name="examples.sequence" tests="3" errors="0" failures="2" skipped="0" timestamp="2023-07-31T13:29:08.844977+00:00" time="0.0623">
-        <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/A/" time="0.029334">
+      <testsuite name="examples.sequence" tests="3" errors="0" failures="2" skipped="0" timestamp="2023-08-25T10:45:51.061162+00:00" time="0.078068">
+        <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/A/" time="0.047357">
           <failure type="Failure" message="something went wrong" />
+          <system-out>{
+        "argv": [],
+        "data": {
+            "foo": "bar"
+        },
+        "reason": "something went wrong",
+        "result": false
+    }</system-out>
+          <properties>
+            <property name="test_id" value="https://github.com/redhat-partner-solutions/testdrive/A/" />
+          </properties>
         </testcase>
-        <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/B/" time="0.02897" />
-        <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/C/" time="0.003881">
+        <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/B/" time="0.025998">
+          <system-out>{
+        "argv": [],
+        "data": {
+            "baz": 99
+        },
+        "reason": null,
+        "result": true
+    }</system-out>
+          <properties>
+            <property name="test_id" value="https://github.com/redhat-partner-solutions/testdrive/B/" />
+          </properties>
+        </testcase>
+        <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/C/" time="0.004589">
           <failure type="Failure" message="no particular reason" />
+          <system-out>{
+        "argv": [],
+        "reason": "no particular reason",
+        "result": false
+    }</system-out>
+          <properties>
+            <property name="test_id" value="https://github.com/redhat-partner-solutions/testdrive/C/" />
+          </properties>
         </testcase>
       </testsuite>
     </testsuites>
@@ -89,6 +182,7 @@ The following JUnit output from testdrive...
 ...and _does not_ validate using the Windy Road JUnit schema:
 
     $ python3 -m testdrive.xml --verbose junit/schema/junit.xsd results.xml
+
     failed validating {'tests': '3', 'errors': '0', 'failures': '2', 'skipped': '0'} with XsdAttributeGroup():
 
     Reason: 'tests' attribute not allowed for element
@@ -121,15 +215,27 @@ The following JUnit output from testdrive...
     Instance:
 
       <testsuites tests="3" errors="0" failures="2" skipped="0">
-        <testsuite name="examples.sequence" tests="3" errors="0" failures="2" skipped="0" timestamp="2023-07-31T13:29:08.844977+00:00" time="0.0623">
-          <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/A/" time="0.029334">
+        <testsuite name="examples.sequence" tests="3" errors="0" failures="2" skipped="0" timestamp="2023-08-25T10:45:51.061162+00:00" time="0.078068">
+          <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/A/" time="0.047357">
             <failure type="Failure" message="something went wrong" />
+            <system-out>{
+          "argv": [],
+          "data": {
+              "foo": "bar"
+          },
+          "reason": "something went wrong",
+          "result": false
+      }</system-out>
+            <properties>
+              <property name="test_id" value="https://github.com/redhat-partner-solutions/testdrive/A/" />
+            </properties>
           </testcase>
-          <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/B/" time="0.02897" />
-          <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/C/" time="0.003881">
-            <failure type="Failure" message="no particular reason" />
-          </testcase>
-        </testsuite>
+          <testcase classname="examples.sequence" name="https://github.com/redhat-partner-solutions/testdrive/B/" time="0.025998">
+            <system-out>{
+          "argv": [],
+          "data": {
+      ...
+      ...
       </testsuites>
 
     Path: /testsuites
@@ -150,18 +256,17 @@ To see the differences between the schemas, simply use diff:
     > 
     > -----
     > JUnit test result schema for the Apache Ant JUnit and JUnitReport tasks
-    13c22,23
-    < 	<xs:simpleType name="ISO8601_DATETIME_PATTERN">
-    ---
-    > 	<!-- modified: add microseconds and explicit UTC timezone -->
-    > 	<xs:simpleType name="ISO8601_DATETIME_UTC">
-    15c25
-    < 			<xs:pattern value="[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}"/>
-    ---
-    > 			<xs:pattern value="[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{6}\+00:00"/>
-    25,40c35
-    < 					<xs:complexType>
-    < 						<xs:complexContent>
+    11a21,36
+    > 
+    > 	<!-- modified: define properties, property elements -->
+    > 	<xs:element name="properties">
+    > 		<xs:complexType>
+    > 			<xs:sequence>
+    > 				<xs:element ref="property" minOccurs="0" maxOccurs="unbounded"/>
+    > 			</xs:sequence>
+    > 		</xs:complexType>
+    > 	</xs:element>
+    > 	<xs:element name="property">
     ...
 
 ## testdrive.asciidoc
