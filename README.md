@@ -12,12 +12,20 @@ this library can be used.
 ## testdrive.run
 
 Module `testdrive.run` is a convenience tool for running a set of tests
-specified in a JSON file. Using example files in this repo:
+specified as lines of JSON in a file. Using example files in this repo:
 
     $ env PYTHONPATH=src python3 -m testdrive.run https://github.com/redhat-partner-solutions/testdrive/ examples/sequence/tests.json
-    {"result": false, "reason": "something went wrong", "data": {"foo": "bar"}, "id": "https://github.com/redhat-partner-solutions/testdrive/A/", "timestamp": "2023-07-31T13:29:08.844977+00:00", "time": 0.029334}
-    {"result": true, "reason": null, "data": {"baz": 99}, "id": "https://github.com/redhat-partner-solutions/testdrive/B/", "timestamp": "2023-07-31T13:29:08.874374+00:00", "time": 0.02897}
-    {"result": false, "reason": "no particular reason", "id": "https://github.com/redhat-partner-solutions/testdrive/C/", "timestamp": "2023-07-31T13:29:08.903396+00:00", "time": 0.003881}
+    {"result": false, "reason": "something went wrong", "data": {"foo": "bar"}, "argv": [], "id": "https://github.com/redhat-partner-solutions/testdrive/A/", "timestamp": "2023-08-25T07:22:57.368206+00:00", "time": 0.056209}
+    {"result": true, "reason": null, "data": {"baz": 99}, "argv": [], "id": "https://github.com/redhat-partner-solutions/testdrive/B/", "timestamp": "2023-08-25T07:22:57.424912+00:00", "time": 0.058858}
+    {"result": false, "reason": "no particular reason", "argv": [], "id": "https://github.com/redhat-partner-solutions/testdrive/C/", "timestamp": "2023-08-25T07:22:57.483833+00:00", "time": 0.005414}
+
+Alternatively, tests can be supplied on stdin. In this case option `--basedir`
+must be supplied. Using example files in this repo:
+
+    $ cat examples/sequence/tests.json | env PYTHONPATH=src python3 -m testdrive.run --basedir=examples/sequence/ https://github.com/redhat-partner-solutions/testdrive/ -
+    {"result": false, "reason": "something went wrong", "data": {"foo": "bar"}, "argv": [], "id": "https://github.com/redhat-partner-solutions/testdrive/A/", "timestamp": "2023-08-25T07:25:49.818848+00:00", "time": 0.029972}
+    {"result": true, "reason": null, "data": {"baz": 99}, "argv": [], "id": "https://github.com/redhat-partner-solutions/testdrive/B/", "timestamp": "2023-08-25T07:25:49.848893+00:00", "time": 0.028337}
+    {"result": false, "reason": "no particular reason", "argv": [], "id": "https://github.com/redhat-partner-solutions/testdrive/C/", "timestamp": "2023-08-25T07:25:49.877293+00:00", "time": 0.003946}
 
 ## testdrive.junit
 
