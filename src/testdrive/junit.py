@@ -62,49 +62,64 @@ def _testsuite(
     return ET.Element('testsuite', attrs)
 
 def _testcase(
-        suite, uri,
-        error=None, failure=None,
+        suite, case,
         time=None,
     ):
-    """Return XML testcase element, for test case success, failure or error.
+    """Return XML testcase element.
 
     `suite` is the name of the test suite;
-    `uri` is the URI of the test case;
-    `error` is the error reason;
-    `failure` is the failure reason;
+    `case` is the name of the test case;
     `time` the elapsed time to run the test.
-
-    Supplying neither `error` nor `failure` implies test success. If both
-    `error` and `failure` are supplied, `failure` is ignored.
     """
     attrs = _buildattrs(
-        classname=suite, name=uri,
+        classname=suite, name=case,
         time=time,
     )
-    e_case = ET.Element('testcase', attrs)
-    if error is not None:
-        message = error.split('\n', 1)[0]
-        e_error = ET.Element('error', {
-            'type': 'Error',
-            'message': message,
-        })
-        e_case.append(e_error)
-    elif failure is not None:
-        message = failure.split('\n', 1)[0]
-        e_failure = ET.Element('failure', {
-            'type': 'Failure',
-            'message': message,
-        })
-        e_case.append(e_failure)
-    return e_case
+    return ET.Element('testcase', attrs)
 
-def junit(suite, cases, hostname=None, prettify=False):
+def _error(message):
+    """Return XML error element.
+
+    `message` is the error reason. (Only the first line will be included.)
+    """
+    attrs = _buildattrs(
+        type='Error',
+        message=message.split('\n', 1)[0],
+    )
+    return ET.Element('error', attrs)
+
+def _failure(message):
+    """Return XML failure element.
+
+    `message` is the failure reason. (Only the first line will be included.)
+    """
+    attrs = _buildattrs(
+        type='Failure',
+        message=message.split('\n', 1)[0],
+    )
+    return ET.Element('failure', attrs)
+
+def _system_out(case, exclude=()):
+    """Return XML system-out element.
+
+    Include `case` as a pretty-printed JSON-encoded object,
+    having omitted pairs for keys in `exclude`.
+    """
+    elem = ET.Element('system-out')
+    elem.text = json.dumps(
+        {k: v for (k,v) in case.items() if k not in exclude},
+        sort_keys=True, indent=4,
+    )
+    return elem
+
+def junit(suite, cases, hostname=None, exclude=(), prettify=False):
     """Return JUnit output for test `cases` in `suite`.
 
     `suite` is the string name of the test suite;
     `cases` is a sequence of dict, with each dict defining test case result and
     metadata;
     `hostname` the name of the host which ran the tests;
+    `exclude` is a sequence of keys to omit from the JSON object in system-out;
     if `prettify` then indent XML output.
 
     Each case must supply values for keys:
@@ -132,16 +147,17 @@ def junit(suite, cases, hostname=None, prettify=False):
         timestamp=timestamp, time=time_total,
     )
     for case in cases:
-        kwargs = {'time': case.get('time')}
+        # TODO: case name or case['id']
+        e_case = _testcase(suite, case['id'], time=case.get('time'))
         if case['result'] is False:
-            kwargs['failure'] = case['reason']
+            e_case.append(_failure(case['reason']))
         elif case['result'] == 'error':
-            kwargs['error'] = case['reason']
+            e_case.append(_error(case['reason']))
         elif case['result'] is not True:
             raise ValueError(
                 f"""bad result "{case['result']}" for case {case['id']}"""
             )
-        e_case = _testcase(suite, case['id'], **kwargs)
+        e_case.append(_system_out(case, exclude=exclude))
         e_suite.append(e_case)
     e_root.append(e_suite)
     if prettify:
@@ -164,6 +180,10 @@ def main():
         )),
     )
     aparser.add_argument(
+        '--exclude', nargs='*', default=('id', 'timestamp', 'time'),
+        help="Omit pairs for these keys from the JSON object in <system-out>",
+    )
+    aparser.add_argument(
         '--prettify', action='store_true',
         help="pretty print XML output",
     )
@@ -178,7 +198,7 @@ def main():
     args = aparser.parse_args()
     with open_input(args.input) as fid:
         cases = tuple(json.loads(line) for line in fid)
-    print(junit(args.suite, cases, args.hostname, args.prettify))
+    print(junit(args.suite, cases, args.hostname, args.exclude, args.prettify))
 
 if __name__ == '__main__':
     main()
