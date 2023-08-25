@@ -234,6 +234,11 @@ def main():
         help="input file, or '-' to read from stdin",
     )
     args = aparser.parse_args()
+    # ensure base URLs are valid before starting
+    if args.baseurl_ids:
+        UriBuilder(args.baseurl_ids)
+    if args.baseurl_specs:
+        UriBuilder(args.baseurl_specs)
     with open_input(args.input) as fid:
         cases = tuple(json.loads(line) for line in fid)
     print(junit(
