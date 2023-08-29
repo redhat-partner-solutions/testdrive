@@ -153,9 +153,17 @@ def junit(
     If `timestamp` is supplied then `time` must also be supplied.
 
     If both `baseurl_ids` and `baseurl_specs` are supplied then add a property
-    for 'test_specification' by mapping a URL under `baseurl_specs`.
+    element for 'test_specification' for each case. The element text is a URL
+    formed by substituting `baseurl_specs` for the base (prefix) of the case
+    'id' (which must be `baseurl_ids`).
     """
     uri_builder = None
+    # always ensure base URLs are valid
+    if args.baseurl_ids:
+        UriBuilder(args.baseurl_ids)
+    if args.baseurl_specs:
+        UriBuilder(args.baseurl_specs)
+    # only use base URLs if both are supplied
     if baseurl_ids and baseurl_specs:
         uri_builder = UriBuilder(baseurl_ids)
     summary = summarize(cases)
@@ -234,11 +242,6 @@ def main():
         help="input file, or '-' to read from stdin",
     )
     args = aparser.parse_args()
-    # ensure base URLs are valid before starting
-    if args.baseurl_ids:
-        UriBuilder(args.baseurl_ids)
-    if args.baseurl_specs:
-        UriBuilder(args.baseurl_specs)
     with open_input(args.input) as fid:
         cases = tuple(json.loads(line) for line in fid)
     print(junit(
