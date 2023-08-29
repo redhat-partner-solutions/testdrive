@@ -20,14 +20,14 @@ class TestDrive(TestCase):
         test = os.path.join(EXAMPLES, 'sequence/B/testimpl.py')
         self.assertEqual(
             drive(test),
-            {'result': True, 'reason': None, 'data': {'baz': 99}},
+            {'argv': (), 'result': True, 'reason': None, 'data': {'baz': 99}},
         )
     def test_failure(self):
         """Test testdrive.run.drive with test failure"""
         test = os.path.join(EXAMPLES, 'sequence/C/test.sh')
         self.assertEqual(
             drive(test),
-            {'result': False, 'reason': 'no particular reason'},
+            {'argv': (), 'result': False, 'reason': 'no particular reason'},
         )
     def test_error(self):
         """Test testdrive.run.drive with test error"""
@@ -35,6 +35,7 @@ class TestDrive(TestCase):
         self.assertEqual(
             drive(test),
             {
+                'argv': (),
                 'result': 'error',
                 'reason': f'{test} exited with code 7\n\nfoo\nbaz\n',
             },
