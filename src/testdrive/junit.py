@@ -159,10 +159,10 @@ def junit(
     """
     uri_builder = None
     # always ensure base URLs are valid
-    if args.baseurl_ids:
-        UriBuilder(args.baseurl_ids)
-    if args.baseurl_specs:
-        UriBuilder(args.baseurl_specs)
+    if baseurl_ids:
+        UriBuilder(baseurl_ids)
+    if baseurl_specs:
+        UriBuilder(baseurl_specs)
     # only use base URLs if both are supplied
     if baseurl_ids and baseurl_specs:
         uri_builder = UriBuilder(baseurl_ids)
