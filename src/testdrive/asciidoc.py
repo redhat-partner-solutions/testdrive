@@ -26,7 +26,7 @@ class Config(dict):
             if test_id.startswith(baseurl):
                 return os.path.join(
                     self['repositories'][suite['repository']],
-                    test_id.split(baseurl, maxsplit=1)[1],
+                    test_id.split(baseurl, maxsplit=1)[1].lstrip('/'),
                 )
         except KeyError:
             pass
