@@ -86,6 +86,32 @@ def row(*cells):
     """Return a string for an asciidoc table row with `cells`."""
     return '\n|\n' + '\n|\n'.join((str(c) for c in cells))
 
+def indent_titles(filename, level):
+    """Indent titles in `filename` such that the first title is at `level`.
+
+    The first title is assumed to have the highest level title in `filename`.
+    """
+    with open(filename, encoding='utf-8') as fid:
+        content = fid.readlines()
+    indent = 0
+    for line in content:
+        first = 0
+        for char in line:
+            if char != '=':
+                break
+            first += 1
+        if first:
+            indent = len(level) - first
+            break
+    if indent <= 0:
+        return
+    prefix = '=' * indent
+    with open(filename, encoding='utf-8', mode='w') as fod:
+        for line in content:
+            if line.startswith('='):
+                line = prefix + line
+            print(line, file=fod, end='')
+
 class TestCase(dict):
     """A test case."""
     def __init__(self, elem):
@@ -326,7 +352,7 @@ class TestSuite(OrderedDict):
                 yield from detail.to_asciidoc(objdir)
             elif case.stdout:
                 yield literal_block(case.stdout)
-    def specs(self, objdir, config):
+    def specs(self, objdir, config, level):
         """Generate asciidoc test specs for this test suite."""
         for case in self.values():
             path = config.case_path_testspec(case)
@@ -334,7 +360,9 @@ class TestSuite(OrderedDict):
             yield case.anchor_spec
             if path:
                 filename = f'{case.uuid}.adoc'
-                copyfile(path, os.path.join(objdir, filename))
+                target = os.path.join(objdir, filename)
+                copyfile(path, target)
+                indent_titles(target, level)
                 yield f'include::{filename}[]'
             else:
                 yield f'_(No test specification for {config.case_title(case)})_'
@@ -367,10 +395,14 @@ class TestSuites(OrderedDict):
             yield from suite.results(objdir, config, level + '=')
             yield ''
             yield '<<<'
-    def specs(self, objdir, config):
+    def specs(self, objdir, config, level):
         """Generate asciidoc test specifications in test suite order."""
         for suite in self.values():
-            yield from suite.specs(objdir, config)
+            yield ''
+            yield f'{level} Test Suite: {suite.name}'
+            yield from suite.specs(objdir, config, level + '=')
+            yield ''
+            yield '<<<'
 
 def main():
     """Generate asciidoc from JUnit XML files.
@@ -409,16 +441,17 @@ def main():
     suites = TestSuites()
     for input_ in args.input:
         suites.include(input_)
+    level_suite = '==='
     print('')
     print('== Summary')
-    print(*suites.summary('==='), sep='\n')
+    print(*suites.summary(level_suite), sep='\n')
     print('')
     print('== Test Results')
-    print(*suites.results(objdir, config, '==='), sep='\n')
+    print(*suites.results(objdir, config, level_suite), sep='\n')
     print('')
     print('[appendix]')
     print('== Test Specifications')
-    print(*suites.specs(objdir, config), sep='\n')
+    print(*suites.specs(objdir, config, level_suite), sep='\n')
 
 if __name__ == '__main__':
     main()
