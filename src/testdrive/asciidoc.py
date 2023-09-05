@@ -274,7 +274,7 @@ class TestSuite(OrderedDict):
             'failures': failures,
             'success': tests - (errors + failures),
             'skipped': int(elem.get('skipped')),
-            'hostname': None, # TODO
+            'hostname': elem.get('hostname'),
             'timestamp': elem.get('timestamp'),
             'duration': Decimal(elem.get('time')),
         }
