@@ -314,8 +314,8 @@ class TestSuite(OrderedDict):
             yield '[cols="1,4"]'
             yield '|==='
             yield ''
-            yield row('*test identifier*', test_id or NOT_RECORDED)
             yield row('*test specification*', case.xref_spec)
+            yield row('*test identifier*', test_id or NOT_RECORDED)
             yield row('*timestamp*', case.timestamp or NOT_RECORDED)
             yield row('*duration (s)*', case.duration)
             yield row('*result*', case.a_result)
