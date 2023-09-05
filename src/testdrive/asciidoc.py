@@ -352,6 +352,8 @@ class TestSuite(OrderedDict):
                 yield from detail.to_asciidoc(objdir)
             elif case.stdout:
                 yield literal_block(case.stdout)
+            yield ''
+            yield '<<<'
     def specs(self, objdir, config, level):
         """Generate asciidoc test specs for this test suite."""
         for case in self.values():
