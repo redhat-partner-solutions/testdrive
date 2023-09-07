@@ -27,6 +27,24 @@ must be supplied. Using example files in this repo:
     {"result": true, "reason": null, "data": {"baz": 99}, "argv": [], "id": "https://github.com/redhat-partner-solutions/testdrive/B/", "timestamp": "2023-08-25T07:25:49.848893+00:00", "time": 0.028337}
     {"result": false, "reason": "no particular reason", "argv": [], "id": "https://github.com/redhat-partner-solutions/testdrive/C/", "timestamp": "2023-08-25T07:25:49.877293+00:00", "time": 0.003946}
 
+`testdrive.run` can also be instructed to call a script colocated with a test
+implementation to plot images of input data / results. Option `--imagedir` must
+be supplied to generate images. Option `--plotter` gives the name of the script
+to call: if there is not a script with this name colocated with the test
+implementation, then plotting is skipped for this image. Using example files in
+this repo:
+
+    $ find examples/ -name 'plot*'
+    examples/sequence/B/plot.sh
+    examples/sequence/C/plot.sh
+
+(These scripts only print examples of expected JSON, they do not create images.)
+
+    $ cat examples/sequence/tests.json | env PYTHONPATH=src python3 -mtestdrive.run --basedir=examples/sequence/ --imagedir=. --plotter=plot.sh https://github.com/redhat-partner-solutions/testdrive/ -
+    {"result": false, "reason": "something went wrong", "data": {"foo": "bar"}, "argv": [], "id": "https://github.com/redhat-partner-solutions/testdrive/A/", "timestamp": "2023-09-04T15:31:30.336801+00:00", "time": 0.029548}
+    {"result": true, "reason": null, "data": {"baz": 99}, "argv": [], "id": "https://github.com/redhat-partner-solutions/testdrive/B/", "timestamp": "2023-09-04T15:31:30.366548+00:00", "time": 0.090166, "plot": [{"path": "./B_testimpl.png", "title": "foo bar baz"}]}
+    {"result": false, "reason": "no particular reason", "argv": [], "id": "https://github.com/redhat-partner-solutions/testdrive/C/", "timestamp": "2023-09-04T15:31:30.460420+00:00", "time": 0.003882, "plot": [{"path": "./C_test.png"}, "./C_test_lhs.pdf", {"path": "./C_test_rhs.pdf", "title": "rhs"}]}
+
 ## testdrive.junit
 
 Module `testdrive.junit` can be used to generate JUnit test results from lines
