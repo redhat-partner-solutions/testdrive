@@ -180,7 +180,6 @@ def junit(
         timestamp=timestamp, time=time_total,
     )
     for case in cases:
-        # TODO: case name or case['id']
         e_case = _testcase(suite, case['id'], time=case.get('time'))
         if case['result'] is False:
             e_case.append(_failure(case['reason']))
