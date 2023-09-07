@@ -148,9 +148,9 @@ def junit(
 
     Each case may supply values for keys:
         timestamp - ISO 8601 string of UTC time when the test was started
-        time - test duration in seconds
+        duration - test duration in seconds
 
-    If `timestamp` is supplied then `time` must also be supplied.
+    If `timestamp` is supplied then `duration` must also be supplied.
 
     If both `baseurl_ids` and `baseurl_specs` are supplied then add a property
     element for 'test_specification' for each case. The element text is a URL
@@ -180,7 +180,7 @@ def junit(
         timestamp=timestamp, time=time_total,
     )
     for case in cases:
-        e_case = _testcase(suite, case['id'], time=case.get('time'))
+        e_case = _testcase(suite, case['id'], time=case.get('duration'))
         if case['result'] is False:
             e_case.append(_failure(case['reason']))
         elif case['result'] == 'error':

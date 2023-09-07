@@ -126,6 +126,8 @@ class TestCase(dict):
         # put each property pair into this test case as a dict
         for child in elem.find('properties').findall('property'):
             self[child.get('name')] = child.get('value')
+        if not self._timestamp or self._duration is None:
+            self._use_timing_from_stdout()
     @staticmethod
     def _result_reason_from_elem(elem):
         """Return test case (result, reason) from `elem`."""
@@ -141,6 +143,16 @@ class TestCase(dict):
         """Return test case output from `elem`."""
         child = elem.find('system-out')
         return child.text if child is not None else None
+    def _use_timing_from_stdout(self):
+        """Set timestamp and duration from JSON object in stdout."""
+        try:
+            dct = json.loads(self.stdout)
+            timestamp = dct.get('timestamp')
+        except (TypeError, JSONDecodeError, AttributeError):
+            return
+        if timestamp:
+            self._timestamp = timestamp
+            self._duration = dct['duration']
     @property
     def uuid(self):
         """A uuid for this test case."""
@@ -343,7 +355,8 @@ class TestSuite(OrderedDict):
             yield row('*test specification*', case.xref_spec)
             yield row('*test identifier*', test_id or NOT_RECORDED)
             yield row('*timestamp*', case.timestamp or NOT_RECORDED)
-            yield row('*duration (s)*', case.duration)
+            duration = NOT_RECORDED if case.duration is None else case.duration
+            yield row('*duration (s)*', duration)
             yield row('*result*', case.a_result)
             yield row('*reason*', case.reason or EMPTY)
             yield '|==='

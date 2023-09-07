@@ -107,10 +107,6 @@ def main():
         )),
     )
     aparser.add_argument(
-        '--timeless', action='store_true',
-        help="Do not record timestamps and times for tests.",
-    )
-    aparser.add_argument(
         'baseurl',
         help="The base URL which test ids are relative to.",
     )
@@ -132,15 +128,13 @@ def main():
         for test, *test_args in source.next():
             id_ = builder.build(os.path.dirname(test))
             testimpl = os.path.join(basedir, test)
-            if not args.timeless:
-                start = timenow()
+            start = timenow()
             result = drive(testimpl, *test_args)
-            if not args.timeless:
-                end = timenow()
+            end = timenow()
             result['id'] = id_
-            if not args.timeless:
+            if 'timestamp' not in result:
                 result['timestamp'] = timestamp(start)
-                result['time'] = (end - start).total_seconds()
+                result['duration'] = (end - start).total_seconds()
             if result['result'] in (True, False) and args.imagedir:
                 plotter = os.path.join(os.path.dirname(testimpl), args.plotter)
                 if os.path.isfile(plotter):
