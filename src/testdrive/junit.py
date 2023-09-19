@@ -217,7 +217,7 @@ def main():
         )),
     )
     aparser.add_argument(
-        '--exclude', nargs='*', default=('id', 'timestamp', 'time'),
+        '--exclude', nargs='*', default=('id',),
         help="Omit pairs for these keys from the JSON object in <system-out>",
     )
     aparser.add_argument(
