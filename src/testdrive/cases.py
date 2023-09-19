@@ -15,22 +15,22 @@ def timing(cases):
     # result variables
     timestamp = duration = None
     # working variables
-    tv_start = tv_end = time_last = None
+    tv_start = tv_end = duration_last = None
     for case in cases:
         if 'timestamp' in case:
             tv_case = timevalue(case['timestamp'])
             if tv_start is None:
                 timestamp = case['timestamp']
                 tv_start = tv_end = tv_case
-                time_last = case['time']
+                duration_last = case['duration']
             elif tv_case < tv_start:
                 timestamp = case['timestamp']
                 tv_start = tv_case
             elif tv_end < tv_case:
                 tv_end = tv_case
-                time_last = case['time']
+                duration_last = case['duration']
     if tv_start is not None:
-        duration = (tv_end - tv_start).total_seconds() + time_last
+        duration = (tv_end - tv_start).total_seconds() + duration_last
         duration = round(duration, 6)
     return (timestamp, duration)
 
