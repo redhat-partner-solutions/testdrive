@@ -120,7 +120,8 @@ class TestCase(dict):
         self._name = elem.get('name')
         self._suite = elem.get('classname')
         self._timestamp = elem.get('timestamp')
-        self._duration = Decimal(elem.get('time'))
+        time = elem.get('time')
+        self._duration = Decimal(time) if time is not None else time
         (self._result, self._reason) = self._result_reason_from_elem(elem)
         self._stdout = self._stdout_from_elem(elem)
         # put each property pair into this test case as a dict
@@ -306,6 +307,7 @@ class TestSuite(OrderedDict):
         tests = int(elem.get('tests'))
         errors = int(elem.get('errors'))
         failures = int(elem.get('failures'))
+        time = elem.get('time')
         return {
             'tests': tests,
             'errors': errors,
@@ -314,7 +316,7 @@ class TestSuite(OrderedDict):
             'skipped': int(elem.get('skipped')),
             'hostname': elem.get('hostname'),
             'timestamp': elem.get('timestamp'),
-            'duration': Decimal(elem.get('time')),
+            'duration': Decimal(time) if time is not None else time,
         }
     @property
     def name(self):
