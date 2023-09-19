@@ -18,7 +18,12 @@ def timing(cases):
     tv_start = tv_end = duration_last = None
     for case in cases:
         if 'timestamp' in case:
-            tv_case = timevalue(case['timestamp'])
+            try:
+                tv_case = timevalue(case['timestamp'])
+            except TypeError:
+                # timestamp is not an ISO format string
+                # skip decimal relative timestamps
+                continue
             if tv_start is None:
                 timestamp = case['timestamp']
                 tv_start = tv_end = tv_case
