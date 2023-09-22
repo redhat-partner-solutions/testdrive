@@ -7,9 +7,9 @@ import json
 
 from xml.etree import ElementTree as ET
 
-from .cases import summarize
-from .common import open_input
-from .uri import UriBuilder
+from ..cases import summarize
+from ..common import open_input
+from ..uri import UriBuilder
 
 def _buildattrs(**kwargs):
     """Return a dict from `kwargs` suitable for creating an XML element with."""
