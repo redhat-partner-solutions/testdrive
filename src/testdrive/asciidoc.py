@@ -281,7 +281,7 @@ class TestDetail:
                     tables.append((key, val))
                 elif isinstance(val, list):
                     try:
-                        analysis[key] = '\n'.join(val)
+                        analysis[key] = '\n'.join(map(str,val))
                     except TypeError:
                         return None
                 else:
