@@ -149,7 +149,7 @@ class TestCase(dict):
         try:
             dct = json.loads(self.stdout)
             timestamp = dct.get('timestamp')
-        except (TypeError, JSONDecodeError, AttributeError):
+        except (TypeError, json.JSONDecodeError, AttributeError):
             return
         if timestamp:
             self._timestamp = timestamp
@@ -211,6 +211,29 @@ class TestCase(dict):
         """Return a cross-reference to this test case specification."""
         return f'<<{self.uuid}_spec>>'
 
+
+class Table:
+    def __init__(self, title, dct):
+        self._title = title
+        self._dct  = dct
+
+    def to_asciidoc(self):
+        yield f'.{self._title}'
+        yield '[cols="1,4"]'
+        yield '|==='
+        yield ''
+        yield from (row(f'*{k}*', self._dct[k]) for k in sorted(self._dct))
+        yield ''
+        yield '|==='
+
+class LiteralBlock:
+    def __init__(self, block):
+        self._block = block
+
+    def to_asciidoc(self):
+        yield literal_block(self._block)
+
+
 class TestDetail:
     """Test detail for a test case."""
     def __init__(self, images=(), tables=()):
@@ -227,15 +250,11 @@ class TestDetail:
             yield ''
             yield f'.{title or os.path.basename(path)}'
             yield f'image::{filename}[]'
-        for (title, dct) in self._tables:
+        
+        for tbl in self._tables:
             yield ''
-            yield f'.{title}'
-            yield '[cols="1,4"]'
-            yield '|==='
-            yield ''
-            yield from (row(f'*{k}*', dct[k]) for k in sorted(dct))
-            yield ''
-            yield '|==='
+            yield from tbl.to_asciidoc()
+
     @staticmethod
     def _image_item(item):
         """Return (title, path) for the image specified by `item`.
@@ -249,6 +268,28 @@ class TestDetail:
             if not isinstance(item, str):
                 return None
             return (None, item)
+        
+    @staticmethod
+    def _tables_from_output(dct):
+        tables = []
+        if dct is not None:
+            if not isinstance(dct, dict):
+                return None
+            analysis = {}
+            for (key, val) in dct.items():
+                if isinstance(val, dict):
+                    tables.append(Table(key, val))
+                elif isinstance(val, list):
+                    try:
+                        analysis[key] = '\n'.join(val)
+                    except TypeError:
+                        return None
+                else:
+                    analysis[key] = val
+            if analysis:
+                tables.insert(0, Table('analysis', analysis))
+        return tables
+
     @classmethod
     def from_output(cls, output):
         """Return an instance of `cls` if `output` is JSON-encoded test detail.
@@ -270,24 +311,12 @@ class TestDetail:
             except ValueError:
                 return None
             images.append((title, path))
-        tables = []
-        dct = obj.get('analysis')
-        if dct is not None:
-            if not isinstance(dct, dict):
-                return None
-            analysis = {}
-            for (key, val) in dct.items():
-                if isinstance(val, dict):
-                    tables.append((key, val))
-                elif isinstance(val, list):
-                    try:
-                        analysis[key] = '\n'.join(val)
-                    except TypeError:
-                        return None
-                else:
-                    analysis[key] = val
-            if analysis:
-                tables.insert(0, ('analysis', analysis))
+
+        analysis = obj.get('analysis')
+        tables = cls._tables_from_output(analysis)
+        if tables is None and analysis is not None:
+            tables = [LiteralBlock(json.dumps(analysis, indent=2))]
+
         return cls(images, tables)
 
 class TestSuite(OrderedDict):
