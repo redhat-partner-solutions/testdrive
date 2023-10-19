@@ -149,7 +149,7 @@ class TestCase(dict):
         try:
             dct = json.loads(self.stdout)
             timestamp = dct.get('timestamp')
-        except (TypeError, JSONDecodeError, AttributeError):
+        except (TypeError, json.JSONDecodeError, AttributeError):
             return
         if timestamp:
             self._timestamp = timestamp
