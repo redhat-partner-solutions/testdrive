@@ -125,8 +125,10 @@ class TestCase(dict):
         (self._result, self._reason) = self._result_reason_from_elem(elem)
         self._stdout = self._stdout_from_elem(elem)
         # put each property pair into this test case as a dict
-        for child in elem.find('properties').findall('property'):
-            self[child.get('name')] = child.get('value')
+        properties = elem.find('properties')
+        if properties is not None:
+            for child in properties.findall('property'):
+                self[child.get('name')] = child.get('value')
         if not self._timestamp or self._duration is None:
             self._use_timing_from_stdout()
     @staticmethod
