@@ -223,7 +223,7 @@ class TestDetail:
         """
         for (title, path) in self._images:
             filename = f'{uuid4()}{os.path.splitext(path)[1]}'
-            copyfile(path, os.path.join(objdir, 'images', filename))
+            copyfile(path, os.path.join(objdir, 'pdf-assets/images', filename))
             yield ''
             yield f'.{title or os.path.basename(path)}'
             yield f'image::{filename}[]'
